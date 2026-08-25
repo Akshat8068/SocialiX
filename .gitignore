@@ -1,0 +1,9 @@
+node_modules/
+.next
+folder.txt
+.env
+.vscode
+dist/
+compose.yaml
+
+
