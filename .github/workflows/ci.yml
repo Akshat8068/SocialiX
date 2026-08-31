@@ -1,0 +1,40 @@
+name: SocialiX CI
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Backend Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./SocialiX-Backend
+          file: ./SocialiX-Backend/Dockerfile
+          push: false
+          tags: socialix-backend:ci
+
+      - name: Build Frontend Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./SocialiX-Frontend
+          file: ./SocialiX-Frontend/Dockerfile
+          push: false
+          tags: socialix-frontend:ci
+
+      - name: Validate Docker Compose
+        run: docker compose -f compose.yaml config
