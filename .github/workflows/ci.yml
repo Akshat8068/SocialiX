@@ -35,6 +35,8 @@ jobs:
           file: ./SocialiX-Frontend/Dockerfile
           push: false
           tags: socialix-frontend:ci
+      - name: Create CI environment file
+        run: cp .env.example .env
 
       - name: Validate Docker Compose
         run: docker compose -f compose.yaml config
