@@ -4,6 +4,6 @@ folder.txt
 .env
 .vscode
 dist/
-
+**/.env
 
 
