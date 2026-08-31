@@ -5,6 +5,7 @@ import { Post } from "./post.entity.js";
 
 import { FollowStatus } from "../../types/types.js";
 import { PostMedia } from "./postMedia/postMedia.entity.js";
+import { AccoutType } from "../users/user.entity.js";
 
 const postMediaRepository = AppDataSource.getRepository(PostMedia)
 const postRepository = AppDataSource.getRepository(Post)
@@ -160,13 +161,31 @@ const getHomeFeed = async (userId: number): Promise<Post[]> => {
     .orderBy("post.createdAt", "DESC")
 
     .getMany();
-};
+}
 
+const getPublicPosts = async (userId: number): Promise<Post[]> => {
 
+    return await postRepository
+        .createQueryBuilder("post")
+        .leftJoinAndSelect("post.user", "user")
+        .leftJoinAndSelect("post.media", "media")
+        .leftJoinAndSelect("post.hashtags", "postHashtags")
+        .leftJoinAndSelect("postHashtags.hashtag", "hashtag")
+        .where("user.accountType = :accountType", {
+            accountType: AccoutType.PUBLIC,
+        })
+        .andWhere("user.id != :userId", {
+            userId,
+        })
+
+        .orderBy("RANDOM()")
+        .getMany()
+}
 
 const postRepositoryMethods = {
   createPost, postsCount, findByUserId,
-  incrementCommentCount, decrementCommentCount, incrementLikeCount, getHomeFeed, decrementLikeCount, deleteByPostId, deletePost, findById, findByPostId, updatePost, createMedia, getUserPosts
+  incrementCommentCount, decrementCommentCount,getPublicPosts,
+  incrementLikeCount, getHomeFeed, decrementLikeCount, deleteByPostId, deletePost, findById, findByPostId, updatePost, createMedia, getUserPosts
 }
 
 export default postRepositoryMethods

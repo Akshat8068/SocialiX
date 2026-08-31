@@ -6,6 +6,7 @@ import likeRepositoryMethod from "../like/like.repository.js"
 import postRepositoryMethods from "./post.repository.js"
 import hashTagRepositoryMethods from "./hashtag/hashTag.repository.js"
 import userRepositoryMethods from "../users/user.repository.js"
+import { Post } from "./post.entity.js"
 
 
 const createPost = async (req: Request, res: Response, next: NextFunction) => {
@@ -107,7 +108,7 @@ const getUserPosts = async (req: Request, res: Response, next: NextFunction) => 
                         }
                         break;
                     }
-                    case PostVisibility.FRIENDS: {break;}
+                    case PostVisibility.FRIENDS: { break; }
 
 
                     default:
@@ -379,15 +380,11 @@ const getHomeFeed = async (req: Request, res: Response, next: NextFunction) => {
         const currentUserId = req.user.id
 
         const following = await followRepositoryMethods.getFollowing(currentUserId)
-
+        let posts:Post[]
         if (following.length === 0) {
-            return res.status(200).json({
-                success: true,
-                message: "No posts found",
-                data: []
-            })
-        }
-        const posts = await postRepositoryMethods.getHomeFeed(req.user.id)
+            posts = await postRepositoryMethods.getPublicPosts(currentUserId)
+        } else { posts = await postRepositoryMethods.getHomeFeed(req.user.id) }
+
         const postIds = posts.map((post) => post.id);
 
         const likedPostIds = await likeRepositoryMethod.findLikedPostIds(
@@ -411,5 +408,5 @@ const getHomeFeed = async (req: Request, res: Response, next: NextFunction) => {
 }
 
 
-const postController = { createPost, getHomeFeed,   getUserPosts, updatePost, getUserPost, getPost, deletePost }
+const postController = { createPost, getHomeFeed, getUserPosts, updatePost, getUserPost, getPost, deletePost }
 export default postController
