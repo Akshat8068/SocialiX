@@ -9,6 +9,7 @@ import { ResetPasswordFormData, resetPasswordSchema } from "@/features/auth/vali
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -36,6 +37,7 @@ const resetPasswordFields: FormFieldConfig[] = [
     },
 ]
 export default function ResetPasswordPage() {
+    const router=useRouter()
     const [resetPassword, { isLoading, isSuccess, isError, error }] = useResetPasswordMutation()
         const form = useForm<ResetPasswordFormData>({
             resolver: zodResolver(resetPasswordSchema),
@@ -50,6 +52,8 @@ export default function ResetPasswordPage() {
                 const response = await resetPassword(data).unwrap()
                 toast.success(response.message)
                 form.reset()
+                router.push("login")
+
             } catch (error: any) {
                 toast.error(error.data?.message ?? "Something went wrong")
             };
